@@ -3,12 +3,13 @@ import { ITransactionData } from "@/utils/types";
 import axios from "axios";
 const addIncome = async (payload : ITransactionData , token:string) => {
     try {
-        await axios.post(`${APP_API_URL}/add-income` , payload , {
+        const response = await axios.post(`${APP_API_URL}/add-income` , payload , {
             headers : {
                 Authorization : `Bearer ${token}`,
                 "Content-Type": "application/json",
             }
-        })
+        });
+        return response.data;
     } catch (error) {
         throw error;
     }

@@ -1,6 +1,6 @@
 import { BadgeDollarSign, Home, TrendingDown, TrendingUp } from "lucide-react";
-import { title } from "process";
-export const APP_API_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL;
+
+export const APP_API_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL || "http://localhost:5000/api";
 
 const SIDEBAR_CONSTANTS = [
     {

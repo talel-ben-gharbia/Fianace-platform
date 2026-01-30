@@ -4,22 +4,43 @@ import { User } from "../models/user.model";
 import { Income } from "../models/income.model";
 
 const addIncome = async (req: Request, res: Response) => {
+  console.log("addIncome called");
   try {
     const { title, emoji, category, amount, date } = req.body;
     const { userId } = getAuth(req);
-    const clerkUser = await clerkClient.users.getUser(userId || "");
-    const email = clerkUser.primaryEmailAddress?.emailAddress;
+    if (!userId) {
+      console.log("addIncome: missing userId");
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    // Try to fetch Clerk user but fail fast if external call hangs
+    let clerkUser;
+    try {
+      clerkUser = await Promise.race([
+        clerkClient.users.getUser(userId || ""),
+        new Promise((_, reject) => setTimeout(() => reject(new Error("Clerk fetch timeout")), 5000)),
+      ] as any);
+    } catch (err) {
+      console.log("addIncome: clerk user fetch failed", err);
+      return res.status(500).json({ message: "Authentication provider error" });
+    }
+
+    const email = clerkUser?.primaryEmailAddress?.emailAddress;
+
     const isIncomeDateEmpty = [title, emoji, category, amount, date].some(
-      (field) => field.toString().trim() === "",
+      (field) => field === undefined || field === null || (typeof field === "string" && field.trim() === ""),
     );
 
-    if (isIncomeDateEmpty) {
-      return res.status(400).json({ message: "All fields are required" });
+    const parsedDate = date ? new Date(date) : null;
+    if (isIncomeDateEmpty || !parsedDate || isNaN(parsedDate.getTime())) {
+      console.log("addIncome: validation failed", { body: { title, emoji, category, amount, date } });
+      return res.status(400).json({ message: "All fields are required and date must be valid" });
     }
 
     const user = await User.findOne({ email });
 
     if (!user) {
+      console.log("addIncome: user not found for", email);
       return res.status(404).json({ message: "User not found" });
     }
 
@@ -29,7 +50,7 @@ const addIncome = async (req: Request, res: Response) => {
       emoji,
       category,
       amount,
-      date,
+      date: parsedDate,
       userId: user._id,
     });
 
@@ -38,6 +59,7 @@ const addIncome = async (req: Request, res: Response) => {
     }
     user.income.push(income._id);
     await user.save();
+    console.log("addIncome: success for user", email, "incomeId", income._id);
     return res
       .status(201)
       .json({ message: "Income added successfully", income });

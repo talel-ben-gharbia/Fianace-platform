@@ -14,13 +14,15 @@ function Income() {
       const token = await  getToken();
       if(!token){
         toast.error("User not authenticated");
-        return;
+        return false;
       }
       await addIncome(incomeData , token) ;
       toast.success("Income added successfully");
+      return true;
     } catch (error) {
       toast.error("Failed to add income");
       console.log(error);
+      return false;
     }
   }
   return (

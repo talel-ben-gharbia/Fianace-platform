@@ -48,7 +48,7 @@ function IncomeModal({onAddIncome}: {onAddIncome: (incomeData: ITransactionData)
       title,
       category,
       amount,
-      date,
+      date ,
     }
 
     if(!selectedEmoji || !title || !category || !amount || !date){
