@@ -1,13 +1,33 @@
+'use client';
 import React from "react";
 import IncomeModal from "./IncomeModal";
 import { SquarePen, Trash2, TrendingUp } from "lucide-react";
+import { toast } from "sonner";
+import { useAuth } from "@clerk/nextjs";
+import { addIncome } from "@/serices/income.services";
+import { ITransactionData } from "@/utils/types";
 
 function Income() {
+  const {getToken} = useAuth();
+  const handleAddIncome = async (incomeData : ITransactionData) => {
+    try {
+      const token = await  getToken();
+      if(!token){
+        toast.error("User not authenticated");
+        return;
+      }
+      await addIncome(incomeData , token) ;
+      toast.success("Income added successfully");
+    } catch (error) {
+      toast.error("Failed to add income");
+      console.log(error);
+    }
+  }
   return (
     <div className="w-[75%] ml-8 mt-6 mr-8">
       <div className="flex w-full justify-between">
         <h1 className="text-xl font-medium">Incomes</h1>
-        <IncomeModal />
+        <IncomeModal onAddIncome={handleAddIncome}/>
       </div>
 
       <div className="mt-4 h-[332px] overflow-y-scroll rounded-3xl border border-gray-300 px-6 py-6 no-scrollbar">

@@ -17,7 +17,15 @@ const userSchema = new mongoose.Schema({
         type :String,
         trim:true,
         required:true,
-    }
+    },
+    expenses : [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Expense',
+    }],
+    income : [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Income',
+    }],
 }, {timestamps:true});
 
 export const User = mongoose.model("User", userSchema);

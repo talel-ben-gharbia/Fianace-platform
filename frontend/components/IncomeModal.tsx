@@ -12,7 +12,7 @@ import {
 import { Button } from "./ui/Button";
 import { ChevronDownIcon, Divide } from "lucide-react";
 import EmojiPicker from "emoji-picker-react";
-import { EmojiObject } from "@/utils/types";
+import { EmojiObject, ITransactionData } from "@/utils/types";
 import { Input } from "./ui/Input";
 import {
   Select,
@@ -27,8 +27,9 @@ import { INCOME_CATEGORY_CONSTATNS } from "@/utils/constants";
 import { Calendar } from "./ui/Calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/Popover";
 import { DialogClose } from "@radix-ui/react-dialog";
+import { toast } from "sonner";
 
-function IncomeModal() {
+function IncomeModal({onAddIncome}: {onAddIncome: (incomeData: ITransactionData) => void}) {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [selectedEmoji, setSelectedEmoji] = useState("💰");
   const [title, setTitle] = useState("");
@@ -40,6 +41,22 @@ function IncomeModal() {
     setSelectedEmoji(emojiObj.emoji);
     setShowEmojiPicker(false);
   };
+
+  const handleAddIncome = () => {
+    const incomeData : ITransactionData = {
+      emoji: selectedEmoji,
+      title,
+      category,
+      amount,
+      date,
+    }
+
+    if(!selectedEmoji || !title || !category || !amount || !date){
+      toast.error("Please fill in all fields");
+      return;
+    }
+    onAddIncome(incomeData);
+  }
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -143,7 +160,7 @@ function IncomeModal() {
           <DialogClose>
             <Button variant="outline">Close</Button>
           </DialogClose>
-          <Button className="cursor-pointer">Add Income</Button>
+          <Button className="cursor-pointer" onClick={handleAddIncome}>Add Income</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
