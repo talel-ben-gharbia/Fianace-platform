@@ -6,7 +6,7 @@ const router = Router();
 
 router.route("/add-income").post(requireAuth(), addIncome);
 
-router.route("/get-income").get(requireAuth, getUserIncome);
+router.route("/get-income").get(requireAuth(), getUserIncome);
 
 router.route("/delete-income/:incomeId").delete(requireAuth(), deleteIncome);
 

@@ -26,7 +26,7 @@ const incomeSchema = new mongoose.Schema(
     amount: {
       type: String, 
       required: true,
-      min: 0,
+      trim: true,
     },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
