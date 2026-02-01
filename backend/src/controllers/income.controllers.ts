@@ -96,7 +96,7 @@ const getUserIncome = async (req: Request, res: Response) => {
 
 const deleteIncome = async (req: Request, res: Response) => {
     try {
-        const {id} =req.params ;
+        const {incomeId} =req.params ;
         const { userId } = getAuth(req);
     const clerkUser = await clerkClient.users.getUser(userId || "");
     const email = clerkUser.primaryEmailAddress?.emailAddress;
@@ -108,14 +108,14 @@ const deleteIncome = async (req: Request, res: Response) => {
 
 
     const deletedIncome = await Income.findOneAndDelete({
-        _id:id,
+        _id:incomeId,
         userId:user._id,
     },);
 
     if(!deletedIncome){
         return res.status(401).json({message :"Income not found or unauthorized"});
     }
-    user.income = user.income.filter((incomeId) => incomeId.toString() !== id);
+    user.income = user.income.filter((Id) => Id.toString() !== incomeId);
     await user.save();
     return res.status(200).json({message:"Income deleted successfully"});
     } catch (error) {
@@ -126,7 +126,7 @@ const deleteIncome = async (req: Request, res: Response) => {
 
 const updateIncome = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const { incomeId } = req.params;
     const { title, emoji, category, amount, date } = req.body;
     const { userId } = getAuth(req);
     const clerkUser = await clerkClient.users.getUser(userId || "");
@@ -146,7 +146,7 @@ const updateIncome = async (req: Request, res: Response) => {
 
     const updateIncome = await Income.findOneAndUpdate(
       {
-        _id: id,
+        _id: incomeId,
         userId: user._id,
       },
       {

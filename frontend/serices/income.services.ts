@@ -31,7 +31,7 @@ const fetchIncome = async (token : string) => {
 
 const updateIncome = async (payload : ITransactionData ,id:string ,token:string ) => {
     try {
-        await axios.post(`${APP_API_URL}/update-income/${id}` , payload , {
+        await axios.put(`${APP_API_URL}/update-income/${id}` , payload , {
             headers : {
                 Authorization : `Bearer ${token}`,
                 "Content-Type": "application/json",

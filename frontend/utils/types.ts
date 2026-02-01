@@ -11,3 +11,11 @@ export type ITransactionData = {
     transactionType?: string;
     _id?: string;
 };
+
+export type ChartPoint = {
+  x: Date;
+  y: number;
+  type?: string;
+  icon?: string;
+  category?: string;
+};

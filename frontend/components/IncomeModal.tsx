@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -28,37 +28,87 @@ import { Calendar } from "./ui/Calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/Popover";
 import { DialogClose } from "@radix-ui/react-dialog";
 import { toast } from "sonner";
+import { set } from "date-fns";
 
-function IncomeModal({onAddIncome}: {onAddIncome: (incomeData: ITransactionData) => void}) {
+function IncomeModal({
+  onAddIncome,
+  onUpdateIncome,
+  showModal,
+  setShowModal,
+  incomeObj,
+  isEditMode,
+  setIsEditMode
+}: {
+  onAddIncome: (incomeData: ITransactionData) => void;
+  onUpdateIncome :(incomeData : ITransactionData) => void;
+  showModal: boolean;
+  setShowModal: (value: boolean) => void;
+  incomeObj: ITransactionData | null;
+  isEditMode: boolean;
+  setIsEditMode: (value: boolean) => void;
+}) {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const [selectedEmoji, setSelectedEmoji] = useState("💰");
-  const [title, setTitle] = useState("");
-  const [category, setCategory] = useState("");
-  const [amount, setAmount] = useState("");
-  const [date, setDate] = useState<Date | null>(null);
+  const [selectedEmoji, setSelectedEmoji] = useState(incomeObj?.emoji || "💰");
+  const [title, setTitle] = useState(incomeObj?.title || "");
+  const [category, setCategory] = useState(incomeObj?.category || "");
+  const [amount, setAmount] = useState(incomeObj?.amount || "");
+  const [date, setDate] = useState<Date | null>(incomeObj?.date || null);
   const [open, setOpen] = useState(false);
   const handleEmojiSelect = (emojiObj: EmojiObject) => {
     setSelectedEmoji(emojiObj.emoji);
     setShowEmojiPicker(false);
   };
 
-  const handleAddIncome = () => {
-    const incomeData : ITransactionData = {
+  const handleAddIncome = async () => {
+    const incomeData: ITransactionData = {
       emoji: selectedEmoji,
       title,
       category,
       amount,
-      date ,
-    }
+      date,
+      _id : incomeObj?._id
+    };
 
-    if(!selectedEmoji || !title || !category || !amount || !date){
+    if (!selectedEmoji || !title || !category || !amount || !date) {
       toast.error("Please fill in all fields");
       return;
     }
-    onAddIncome(incomeData);
+    if(isEditMode){
+      await onUpdateIncome(incomeData);
+      setShowModal(false);
+    }else{
+      await onAddIncome(incomeData);
+      setShowModal(false);
+    }
+
+    
+  };
+
+  const handleReset = () => {
+    setSelectedEmoji("💰");
+    setTitle("");
+    setCategory("");
+    setAmount("");
+    setDate(null);
   }
+  const handleOpen = () => {
+    setShowModal(!showModal);
+    if(!showModal){
+      handleReset();
+    }
+  };
+
+  useEffect(() => {
+    if (incomeObj) {
+      setSelectedEmoji(incomeObj.emoji);
+      setTitle(incomeObj.title);
+      setCategory(incomeObj.category);
+      setAmount(incomeObj.amount);
+      setDate(incomeObj.date);
+    }
+  }, [incomeObj]);
   return (
-    <Dialog>
+    <Dialog open={showModal} onOpenChange={handleOpen}>
       <DialogTrigger asChild>
         <Button className="cursor-pointer">Add income</Button>
       </DialogTrigger>
@@ -137,7 +187,7 @@ function IncomeModal({onAddIncome}: {onAddIncome: (incomeData: ITransactionData)
             <Popover open={open} onOpenChange={setOpen}>
               <PopoverTrigger asChild className="cursor">
                 <Button variant="outline" className="flex justify-between">
-                  {date ? new Date(date).toLocaleDateString() : "Select date" }
+                  {date ? new Date(date).toLocaleDateString() : "Select date"}
                   <ChevronDownIcon />
                 </Button>
               </PopoverTrigger>
@@ -145,7 +195,8 @@ function IncomeModal({onAddIncome}: {onAddIncome: (incomeData: ITransactionData)
                 <Calendar
                   mode="single"
                   selected={date}
-                  onSelect={(date) => {setDate(date ?? null);
+                  onSelect={(date) => {
+                    setDate(date ?? null);
                     setOpen(false);
                   }}
                   className="rounded-lg border"
@@ -160,7 +211,9 @@ function IncomeModal({onAddIncome}: {onAddIncome: (incomeData: ITransactionData)
           <DialogClose>
             <Button variant="outline">Close</Button>
           </DialogClose>
-          <Button className="cursor-pointer" onClick={handleAddIncome}>Add Income</Button>
+          <Button className="cursor-pointer" onClick={handleAddIncome}>
+            {isEditMode ? "Update Income" : "Add Income"}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
