@@ -12,10 +12,11 @@ export type ITransactionData = {
     _id?: string;
 };
 
-export type ChartPoint = {
-  x: Date;
+export type IChartSeriesPoint = {
+  x: number;
   y: number;
   type?: string;
   icon?: string;
-  category?: string;
+  tCategory?: string;
+  rawDate: Date;
 };

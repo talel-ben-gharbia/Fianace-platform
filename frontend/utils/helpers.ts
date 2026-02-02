@@ -1,9 +1,9 @@
 import { Chart, Legend } from "./../node_modules/highcharts/highcharts.d";
-import { ChartPoint, ITransactionData } from "./types";
+import { IChartSeriesPoint, ITransactionData } from "./types";
 
 const getCHartsOptions = (
   categories: string[],
-  seriesData: ITransactionData[],
+  seriesData: IChartSeriesPoint[],
   chartType: ChartTypes = "column",
 ): Highcharts.Options => {
   return {
@@ -34,7 +34,9 @@ const getCHartsOptions = (
   shared: true, // MUST have this to use this.points
   shadow: false,
   backgroundColor: "transparent",
-  formatter: function () {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  formatter: function (this: any) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const point: any = this.points?.[0];
     if (!point) return "";
 
@@ -89,10 +91,10 @@ const fetchTransactionsList = (List: ITransactionData[]) => {
   });
 
   const sortedByDate = chartData.sort(
-    (a: ChartPoint, b: ChartPoint) => a.x.getTime() - b.x.getTime(),
+    (a, b) => a.x.getTime() - b.x.getTime(),
   );
 
-  const newSeriesData = sortedByDate.map((point: ChartPoint, index: number) => {
+  const newSeriesData = sortedByDate.map((point, index: number) => {
     const { y, type, icon, category, x } = point ;
 
     return {
@@ -104,7 +106,7 @@ const fetchTransactionsList = (List: ITransactionData[]) => {
       rawDate: x,
     };
   });
-  const newCategories = sortedByDate.map((p: ChartPoint) =>
+  const newCategories = sortedByDate.map((p) =>
     p.x.toLocaleDateString("en-US", {
       day: "numeric",
       month: "short",

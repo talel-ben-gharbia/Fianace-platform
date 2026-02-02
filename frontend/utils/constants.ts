@@ -53,5 +53,14 @@ const INCOME_CATEGORY_CONSTATNS =[
 
 ];
 
+const EXPENSE_CATEGORY_CONSTATNS = [
+  { value: "food", title: "Food" },
+  { value: "rent", title: "Rent" },
+  { value: "shopping", title: "Shopping" },
+  { value: "bills", title: "Bills" },
+  { value: "travel", title: "Travel" },
+  { value: "entertainment", title: "Entertainment" },
+  { value: "otherExpense", title: "Other Expense" },
+];
 
-export { SIDEBAR_CONSTANTS, INCOME_CATEGORY_CONSTATNS };
+export { SIDEBAR_CONSTANTS, INCOME_CATEGORY_CONSTATNS, EXPENSE_CATEGORY_CONSTATNS };

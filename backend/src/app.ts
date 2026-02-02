@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import clerkRoutes from './routes/clerk.routes';
 import incomeRouter from './routes/income.routes';
+import expenseRouter from './routes/expense.routes';
 const app = express();
 
 app.use(cors({
@@ -13,4 +14,5 @@ app.use(cors({
 app.use(express.json());
 app.use('/api/clerk', clerkRoutes);
 app.use('/api', incomeRouter);
+app.use('/api', expenseRouter);
 export default app;
