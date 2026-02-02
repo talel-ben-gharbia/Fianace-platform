@@ -9,7 +9,7 @@ import {
   deleteIncome,
   fetchIncome,
   updateIncome,
-} from "@/serices/income.services";
+} from "@/services/income.services";
 import { IChartSeriesPoint, ITransactionData } from "@/utils/types";
 import { Spinner } from "./ui/Spinner";
 import * as Highcharts from "highcharts";
@@ -136,7 +136,7 @@ function Income() {
       ) : null}
 
       {incomeList?.length ? (
-        <div className="mt-4 h-[332px] overflow-y-scroll rounded-3xl border border-gray-300 px-6 py-6 no-scrollbar">
+        <div className="mt-4 h-83 overflow-y-scroll rounded-3xl border border-gray-300 px-6 py-6 no-scrollbar">
           <div className="grid grid-cols-2 gap-10">
             {incomeList.map((income) => (
               <div
@@ -155,7 +155,7 @@ function Income() {
                       {income.category}
                     </span>
                     <span className="text-xs text-gray-400 font-medium">
-                      {new Date(income.date).toLocaleDateString()}
+                      {income.date ? new Date(income.date).toLocaleDateString() : ''}
                     </span>
                   </div>
                 </div>

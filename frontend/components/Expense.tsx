@@ -9,7 +9,7 @@ import {
   deleteExpense,
   fetchExpense,
   updateExpense,
-} from "@/serices/expense.services";
+} from "@/services/expense.services";
 import { IChartSeriesPoint, ITransactionData } from "@/utils/types";
 import { Spinner } from "./ui/Spinner";
 import * as Highcharts from "highcharts";
@@ -136,7 +136,7 @@ function Expense() {
       ) : null}
 
       {expenseList?.length ? (
-        <div className="mt-4 h-[332px] overflow-y-scroll rounded-3xl border border-gray-300 px-6 py-6 no-scrollbar">
+        <div className="mt-4 h-83 overflow-y-scroll rounded-3xl border border-gray-300 px-6 py-6 no-scrollbar">
           <div className="grid grid-cols-2 gap-10">
             {expenseList.map((expense) => (
               <div

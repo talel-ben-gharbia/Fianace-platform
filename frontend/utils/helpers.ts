@@ -80,22 +80,30 @@ const getCHartsOptions = (
   };
 };
 const fetchTransactionsList = (List: ITransactionData[]) => {
-  const chartData = List.map((t: ITransactionData) => {
-    return {
-      x: new Date(t.date || ""),
-      y: Number(t.amount),
-      type: t.transactionType,
-      icon: t.emoji,
-      category: t.category,
-    };
-  });
+  // Build date-aware chart data and ignore entries with invalid/missing dates
+  const chartData = List
+    .map((t: ITransactionData) => {
+      if (!t.date) return null;
+      const dateObj = t.date instanceof Date ? t.date : new Date(t.date as any);
+      if (isNaN(dateObj.getTime())) return null;
+      return {
+        x: dateObj,
+        y: Number(t.amount),
+        type: t.transactionType,
+        icon: t.emoji,
+        category: t.category,
+      };
+    })
+    .filter((p): p is { x: Date; y: number; type?: string; icon?: string; category?: string } => p !== null);
 
-  const sortedByDate = chartData.sort(
-    (a, b) => a.x.getTime() - b.x.getTime(),
-  );
+  if (!chartData.length) {
+    return { newSeriesData: [], newCategories: [] };
+  }
+
+  const sortedByDate = chartData.sort((a, b) => a.x.getTime() - b.x.getTime());
 
   const newSeriesData = sortedByDate.map((point, index: number) => {
-    const { y, type, icon, category, x } = point ;
+    const { y, type, icon, category } = point;
 
     return {
       x: index,
@@ -103,9 +111,10 @@ const fetchTransactionsList = (List: ITransactionData[]) => {
       type,
       icon,
       tCategory: category,
-      rawDate: x,
+      rawDate: point.x,
     };
   });
+
   const newCategories = sortedByDate.map((p) =>
     p.x.toLocaleDateString("en-US", {
       day: "numeric",
