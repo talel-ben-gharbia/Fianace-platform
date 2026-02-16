@@ -134,3 +134,8 @@
 .no-scrollbar {
   scrollbar-width: none; 
 }
+
+/* Ensure the app and main container can stretch to full viewport height */
+html, body, #__next, main {
+  height: 100%;
+}

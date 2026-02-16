@@ -3,8 +3,9 @@ import React, { useEffect, useState } from 'react'
 import TransactionModal from './TransactionModal'
 import { ITransactionData, IChartSeriesPoint } from '@/utils/types';
 import { useAuth } from '@clerk/nextjs';
-import { fetchIncome, addIncome, updateIncome, deleteIncome } from '@/services/income.services';
-import { fetchExpense, addExpense, updateExpense, deleteExpense } from '@/services/expense.services';
+import { addIncome, updateIncome, deleteIncome } from '@/services/income.services';
+import { addExpense, updateExpense, deleteExpense } from '@/services/expense.services';
+import { getAllTransactions } from '@/services/transaction.service';
 import { Spinner } from './ui/Spinner';
 import { SquarePen, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -41,12 +42,8 @@ function Transaction() {
             setLoading(true);
             const token = await getToken();
             if (!token) return;
-            const incomes = await fetchIncome(token) as ITransactionData[];
-            const expenses = await fetchExpense(token) as ITransactionData[];
-            const combined = [
-                ...(incomes || []),
-                ...(expenses || []),
-            ].map(t => ({ ...t, date: t.date ? new Date(t.date as any) : null }));
+            const combinedResp = await getAllTransactions(token) as ITransactionData[];
+            const combined = (combinedResp || []).map(t => ({ ...t, date: t.date ? new Date(t.date as any) : null }));
             combined.sort((a,b) => (b.date?.getTime() || 0) - (a.date?.getTime() || 0));
 
             // prepare chart data
@@ -129,7 +126,7 @@ function Transaction() {
     }
 
   return (
-    <div className='w-[75%] ml-8 mt-6 mr-8'>
+    <div className='w-full mt-6 px-8 min-h-screen h-full'>
         <div className="flex w-full justify-between">
         <h1 className="text-xl font-medium">Transactions</h1>
         <TransactionModal

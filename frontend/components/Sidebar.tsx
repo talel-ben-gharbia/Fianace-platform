@@ -16,7 +16,7 @@ function Sidebar() {
     return null;
   }
   return (
-    <div className="bg-sidebar w-1/5 h-full flex justify-between flex-col p-4">
+    <div className="bg-sidebar w-1/6 h-screen overflow-y-auto flex justify-between flex-col p-4">
       <div className="flex flex-col">
         <div className="flex items-center gap-2">
           <CircleDollarSign size={32} />

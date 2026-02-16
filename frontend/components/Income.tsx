@@ -111,7 +111,7 @@ function Income() {
   },[categories,seriesData]);
     
   return (
-    <div className="w-[75%] ml-8 mt-6 mr-8">
+    <div className="w-full mt-6 px-8 min-h-screen h-full">
       <div className="flex w-full justify-between">
         <h1 className="text-xl font-medium">Incomes</h1>
         <IncomeModal

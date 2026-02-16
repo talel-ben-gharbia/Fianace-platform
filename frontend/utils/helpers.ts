@@ -5,6 +5,7 @@ const getCHartsOptions = (
   categories: string[],
   seriesData: IChartSeriesPoint[],
   chartType: ChartTypes = "column",
+  height = 250,
 ): Highcharts.Options => {
   return {
     title: {
@@ -18,8 +19,9 @@ const getCHartsOptions = (
       enabled: false,
     },
     chart: {
-      height: 250,
+      height,
       backgroundColor: "transparent",
+      spacing: [10, 10, 15, 10],
     },
     legend: {
       enabled: false,
@@ -75,23 +77,38 @@ const getCHartsOptions = (
             data: seriesData,
             color : "#8271fe",
         }
-    ]
+    ],
+    responsive: {
+      rules: [{
+        condition: { maxWidth: 480 },
+        chartOptions: { chart: { height: Math.max(220, Math.round(height * 0.8)) } }
+      }]
+    }
 
   };
 };
 const fetchTransactionsList = (List: ITransactionData[]) => {
-  // Build date-aware chart data and ignore entries with invalid/missing dates
+  // Build date-aware chart data and ignore entries with invalid/missing dates.
+  // Be permissive: accept Date objects, ISO strings, or fall back to createdAt if available.
   const chartData = List
     .map((t: ITransactionData) => {
-      if (!t.date) return null;
-      const dateObj = t.date instanceof Date ? t.date : new Date(t.date as any);
+      // try transaction date, fallback to createdAt if present
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const rawDateCandidate: any = (t as any).date ?? (t as any).createdAt ?? null;
+      if (!rawDateCandidate) return null;
+      const dateObj = rawDateCandidate instanceof Date ? rawDateCandidate : new Date(rawDateCandidate as any);
       if (isNaN(dateObj.getTime())) return null;
+
+      // parse amount robustly (strip non-number characters)
+      const amountNum = Number(String(t.amount || "").replace(/[^0-9.-]+/g, ""));
+      if (Number.isNaN(amountNum)) return null;
+
       return {
         x: dateObj,
-        y: Number(t.amount),
-        type: t.transactionType,
-        icon: t.emoji,
-        category: t.category,
+        y: amountNum,
+        type: t.transactionType ?? "",
+        icon: t.emoji ?? "",
+        category: t.category ?? "",
       };
     })
     .filter((p): p is { x: Date; y: number; type?: string; icon?: string; category?: string } => p !== null);
